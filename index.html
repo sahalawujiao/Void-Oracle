@@ -2,56 +2,49 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>神秘塔罗 - 三牌阵占卜</title>
+    <title>BitFate 比特命运 - 塔罗占卜</title>
     <style>
         :root {
             --gold: #d4af37;
             --deep-purple: #1a1a2e;
+            --card-white: #fdfbf7;
         }
         body {
             background-color: var(--deep-purple);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #eee;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            padding: 40px 20px;
             margin: 0;
-            padding: 20px;
         }
-        h1 { color: var(--gold); }
-        
-        /* 牌阵容器 */
+        h1 { color: var(--gold); letter-spacing: 4px; margin-bottom: 40px; }
+
+        /* 牌阵布局 */
         .spread {
             display: flex;
-            gap: 20px;
-            margin-top: 50px;
-            perspective: 1000px;
+            gap: 30px;
+            perspective: 1200px;
+            margin-bottom: 40px;
         }
 
-        .card-slot {
-            text-align: center;
-            width: 150px;
+        .card-slot { width: 160px; text-align: center; }
+        .slot-label { 
+            color: var(--gold); 
+            margin-bottom: 15px; 
+            font-size: 0.9em;
+            text-transform: uppercase;
         }
 
-        .slot-title {
-            margin-bottom: 10px;
-            color: var(--gold);
-            font-weight: bold;
-        }
-
-        /* 卡牌 3D 翻转效果 */
+        /* 卡牌样式 */
         .card {
-            width: 150px;
-            height: 260px;
+            width: 160px;
+            height: 280px;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-        }
-
-        .card.flipped {
-            transform: rotateY(180deg);
         }
 
         .card-face {
@@ -59,128 +52,150 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 2px solid var(--gold);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 15px;
             box-sizing: border-box;
         }
 
         .card-back {
-            background: linear-gradient(45deg, #2c3e50, #000);
-            background-image: radial-gradient(var(--gold) 1px, transparent 0);
-            background-size: 20px 20px;
+            background: #222;
+            background-image: repeating-linear-gradient(45deg, #222 0, #222 10px, #2a2a2a 10px, #2a2a2a 20px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
         .card-front {
-            background: white;
+            background: var(--card-white);
             color: #333;
             transform: rotateY(180deg);
-            flex-direction: column;
-            text-align: center;
         }
 
-        .meaning-box {
-            margin-top: 30px;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
+        /* 逆位样式：增加一个 class 控制旋转 */
+        .card-front.reversed-img {
+            transform: rotateY(180deg) rotateZ(180deg);
+        }
+
+        .card.is-flipped { transform: rotateY(180deg); }
+
+        /* 解读区 */
+        .reading-panel {
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--gold);
+            padding: 25px;
             border-radius: 8px;
             display: none;
+            line-height: 1.8;
         }
 
+        .card-name { font-weight: bold; color: var(--gold); }
+        .rev-tag { color: #cc4444; font-size: 0.8em; margin-left: 5px; }
+
         button {
-            margin-top: 30px;
-            padding: 10px 30px;
-            background: var(--gold);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
+            background: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            padding: 12px 40px;
             font-size: 1.1em;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 40px;
         }
+        button:hover { background: var(--gold); color: var(--deep-purple); }
     </style>
 </head>
 <body>
 
-    <h1>塔罗圣殿 · 三牌阵</h1>
-    
+    <h1>BITFATE 比特命运</h1>
+
     <div class="spread">
         <div class="card-slot">
-            <div class="slot-title">过去</div>
-            <div class="card" id="card-0">
+            <div class="slot-label">昨日·起源</div>
+            <div class="card" id="card-0" onclick="this.classList.toggle('is-flipped')">
                 <div class="card-face card-back"></div>
                 <div class="card-face card-front" id="front-0"></div>
             </div>
         </div>
         <div class="card-slot">
-            <div class="slot-title">现在</div>
-            <div class="card" id="card-1">
+            <div class="slot-label">今日·现状</div>
+            <div class="card" id="card-1" onclick="this.classList.toggle('is-flipped')">
                 <div class="card-face card-back"></div>
                 <div class="card-face card-front" id="front-1"></div>
             </div>
         </div>
         <div class="card-slot">
-            <div class="slot-title">未来</div>
-            <div class="card" id="card-2">
+            <div class="slot-label">明日·导向</div>
+            <div class="card" id="card-2" onclick="this.classList.toggle('is-flipped')">
                 <div class="card-face card-back"></div>
                 <div class="card-face card-front" id="front-2"></div>
             </div>
         </div>
     </div>
 
-    <button onclick="startReading()">洗牌并占卜</button>
+    <button onclick="drawFate()">开启启示</button>
 
-    <div class="meaning-box" id="result">
-        <h3>解读建议：</h3>
-        <p id="interpretation"></p>
+    <div class="reading-panel" id="readingPanel">
+        <h3 style="margin-top:0">✨ 命运的丝线：</h3>
+        <div id="interpretationContent"></div>
     </div>
 
     <script>
-        // 1. 数据定义 (示例部分卡牌，你可以自行扩充到 78 张)
-        const deck = [
-            { name: "愚者", meaning: "纯真、新的开始、自由。" },
-            { name: "魔术师", meaning: "创造力、行动力、潜能。" },
-            { name: "女祭司", meaning: "直觉、潜意识、神秘。" },
-            { name: "皇后", meaning: "丰饶、母性、自然。" },
-            { name: "皇帝", meaning: "权威、秩序、稳定。" },
-            { name: "恋人", meaning: "选择、和谐、关系。" },
-            { name: "战车", meaning: "意志、胜利、自律。" },
-            { name: "死神", meaning: "结束、转化、新陈代谢。" }
+        // 扩展数据库：加入正位和逆位的简单解读
+        const tarotDeck = [
+            { name: "愚者", up: "代表新的旅程、好奇心和不畏艰险。建议：勇敢迈出第一步。", rev: "代表鲁莽、不计后果。建议：在跳下深渊前先看清脚下。" },
+            { name: "魔术师", up: "代表你有能力掌控当前的资源。建议：现在是行动的最佳时机。", rev: "代表沟通受阻或能力被滥用。建议：重新审视你的动机。" },
+            { name: "女祭司", up: "代表直觉和内在智慧。建议：静下心来听听内心的声音。", rev: "代表忽略了直觉，或过于压抑情感。建议：不要逃避真相。" },
+            { name: "死神", up: "代表一个阶段的结束和重生。建议：放手过去，拥抱变化。", rev: "代表抗拒改变或停滞不前。建议：强行挽留只会带来更多痛苦。" },
+            { name: "恋人", up: "代表和谐的关系与重大的抉择。建议：听从内心的价值观。", rev: "代表失衡或逃避决定。建议：面对现实中的冲突。" },
+            { name: "隐士", up: "代表独处与反思。建议：暂时退出社交，寻找真理。", rev: "代表孤独感或过于孤立。建议：适时与外界保持沟通。" }
         ];
 
-        function startReading() {
-            // 隐藏上次的结果
-            document.getElementById('result').style.display = 'none';
-            
-            // 2. 洗牌逻辑 (Fisher-Yates)
-            let shuffled = [...deck].sort(() => Math.random() - 0.5);
-            
-            // 3. 抽取前三张并渲染
+        function drawFate() {
+            const panel = document.getElementById('readingPanel');
+            const content = document.getElementById('interpretationContent');
+            panel.style.display = 'none';
+            content.innerHTML = "";
+
+            // 1. 洗牌并抽取 3 张
+            let shuffled = [...tarotDeck].sort(() => Math.random() - 0.5);
+            let slots = ["昨日", "今日", "明日"];
+            let fullAnalysis = "";
+
             for (let i = 0; i < 3; i++) {
-                const cardElement = document.getElementById(`card-${i}`);
-                const frontElement = document.getElementById(`front-${i}`);
-                const cardData = shuffled[i];
+                const card = shuffled[i];
+                const isReversed = Math.random() > 0.5; // 50% 概率逆位
+                const cardUI = document.getElementById(`card-${i}`);
+                const frontUI = document.getElementById(`front-${i}`);
 
-                // 先重置翻牌状态
-                cardElement.classList.remove('flipped');
+                // 重置动画
+                cardUI.classList.remove('is-flipped');
                 
-                // 延迟翻牌，增加仪式感
+                // 延迟处理翻牌逻辑
                 setTimeout(() => {
-                    frontElement.innerHTML = `<h3>${cardData.name}</h3><small>${cardData.meaning}</small>`;
-                    cardElement.classList.add('flipped');
-                }, i * 400);
+                    // 处理正逆位视觉
+                    frontUI.classList.toggle('reversed-img', isReversed);
+                    
+                    // 填充文字
+                    const title = isReversed ? `${card.name}<span class="rev-tag">(逆位)</span>` : `${card.name}`;
+                    const meaning = isReversed ? card.rev : card.up;
+                    
+                    frontUI.innerHTML = `<div style="font-size:1.2em; margin-bottom:10px;">${title}</div><p style="font-size:0.8em; color: #666;">${meaning}</p>`;
+                    
+                    cardUI.classList.add('is-flipped');
+                    
+                    // 构建底部易懂解读
+                    fullAnalysis += `<p><strong>关于${slots[i]}：</strong> 你抽到了 <span class="card-name">${card.name}${isReversed?'(逆位)':''}</span>。${meaning}</p>`;
+                    
+                    if(i === 2) {
+                        content.innerHTML = fullAnalysis;
+                        panel.style.display = 'block';
+                    }
+                }, i * 500);
             }
-
-            // 4. 显示综合解读
-            setTimeout(() => {
-                const resultBox = document.getElementById('result');
-                const intro = `你的旅程从 **${shuffled[0].name}** 开始，经过 **${shuffled[1].name}** 的洗礼，最终将走向 **${shuffled[2].name}** 的启示。`;
-                document.getElementById('interpretation').innerHTML = intro;
-                resultBox.style.display = 'block';
-            }, 1500);
         }
     </script>
 </body>
