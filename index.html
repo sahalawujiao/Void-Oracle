@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BitFate 比特命运 - 塔罗启示录</title>
+    <title>BitFate - 比特命运占卜</title>
     <style>
         :root {
             --gold: #d4af37;
-            --deep-blue: #0f172a;
-            --card-ivory: #fdfbf7;
+            --deep-purple: #0f172a;
+            --ivory: #fdfbf7;
         }
 
         body {
-            background-color: var(--deep-blue);
+            background-color: var(--deep-purple);
             color: #e2e8f0;
             font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
             margin: 0;
@@ -23,262 +23,155 @@
             padding: 40px 20px;
         }
 
-        h1 {
-            color: var(--gold);
-            letter-spacing: 6px;
-            font-size: 2.5rem;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #94a3b8;
-            margin-bottom: 40px;
-            font-size: 0.9rem;
-        }
+        h1 { color: var(--gold); letter-spacing: 6px; margin-bottom: 5px; }
+        .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 40px; }
 
         /* 牌阵区域 */
         .spread {
             display: flex;
-            gap: 30px;
+            gap: 25px;
             perspective: 1500px;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
-        .card-slot {
-            width: 180px;
-            text-align: center;
-        }
+        .card-slot { width: 170px; text-align: center; }
+        .slot-label { color: var(--gold); margin-bottom: 15px; font-weight: bold; }
 
-        .slot-label {
-            color: var(--gold);
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 1rem;
-            opacity: 0.8;
-        }
-
-        /* 卡牌基础结构 */
+        /* 卡牌样式 */
         .card {
-            width: 180px;
-            height: 310px;
+            width: 170px;
+            height: 290px;
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
         }
 
-        .card.is-flipped {
-            transform: rotateY(180deg);
-        }
+        .card.is-flipped { transform: rotateY(180deg); }
 
         .card-face {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             backface-visibility: hidden;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
-        /* 卡背设计 */
         .card-back {
             background: #1e293b;
             border: 3px solid var(--gold);
             display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .card-back::after {
-            content: "✧";
-            font-size: 3rem;
-            color: var(--gold);
-            opacity: 0.5;
+            align-items: center; justify-content: center;
         }
 
-        /* 卡面设计 */
+        .card-back::after { content: "✧"; font-size: 2.5rem; color: var(--gold); opacity: 0.4; }
+
         .card-front {
-            background: var(--card-ivory);
+            background: var(--ivory);
             transform: rotateY(180deg);
-            padding: 8px;
+            padding: 6px;
+            border: 2px solid var(--gold);
+            display: flex; flex-direction: column;
             box-sizing: border-box;
-            border: 2px solid var(--gold);
-            display: flex;
-            flex-direction: column;
         }
 
-        .card-inner-border {
-            border: 1px solid #d4af37;
+        .inner-border {
+            border: 1px solid var(--gold);
             height: 100%;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             padding: 5px;
-        }
-
-        .card-img-box {
-            flex-grow: 1;
             position: relative;
-            overflow: hidden;
-            background: #eee;
         }
 
-        .card-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s;
-        }
+        .img-box { flex-grow: 1; overflow: hidden; background: #eee; position: relative; }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .img-reversed { transform: rotate(180deg); }
 
-        /* 逆位图片的旋转 */
-        .img-reversed {
-            transform: rotate(180deg);
-        }
+        .card-info { height: 50px; text-align: center; color: #2d3436; margin-top: 5px; }
+        .card-name { font-weight: bold; font-size: 0.95rem; margin: 0; }
+        .card-status { font-size: 0.7rem; }
 
-        .card-info {
-            height: 60px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #2d3436;
-        }
-
-        .card-title {
-            font-weight: bold;
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        .card-status {
-            font-size: 0.7rem;
-            color: #b33939;
-            margin-top: 2px;
-        }
-
-        /* 流光扫过效果 */
+        /* 流光特效 */
         .shine {
-            position: absolute;
-            top: 0; left: -100%;
+            position: absolute; top: 0; left: -100%;
             width: 100%; height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
-            transition: none;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
         }
+        .is-flipped .shine { animation: sweep 1.2s ease forwards 0.6s; }
+        @keyframes sweep { 0% { left: -100%; } 100% { left: 100%; } }
 
-        .is-flipped .shine {
-            animation: sweep 1.5s ease-in-out forwards 0.5s;
-        }
-
-        @keyframes sweep {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        /* 控制按钮 */
+        /* UI 组件 */
         button {
-            background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-            padding: 15px 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 30px;
-            margin-bottom: 40px;
+            background: transparent; color: var(--gold); border: 2px solid var(--gold);
+            padding: 12px 45px; font-size: 1.1rem; border-radius: 25px;
+            cursor: pointer; transition: 0.3s;
         }
+        button:hover { background: var(--gold); color: var(--deep-purple); }
 
-        button:hover {
-            background: var(--gold);
-            color: var(--deep-blue);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-        }
-
-        /* 解读面板 */
         .reading-panel {
-            max-width: 700px;
-            width: 100%;
+            max-width: 700px; width: 100%;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            display: none;
-            animation: fadeIn 1s ease;
+            padding: 25px; border-radius: 12px; margin-top: 30px;
+            display: none; border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
-        .reading-item {
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 15px;
-        }
-
-        .reading-item:last-child { border: none; }
-
-        .reading-pos { color: var(--gold); font-weight: bold; margin-right: 10px; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 600px) {
-            .spread { gap: 15px; }
-            .card-slot { width: 100px; }
-            .card { width: 100px; height: 170px; }
-            .card-title { font-size: 0.8rem; }
-        }
+        .reading-item { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .pos-tag { color: var(--gold); font-weight: bold; margin-right: 8px; }
     </style>
 </head>
 <body>
 
     <h1>BITFATE</h1>
-    <div class="subtitle">—— 拨开比特的迷雾，预见命运的阵列 ——</div>
+    <div class="subtitle">—— 拨开比特迷雾，预见命运阵列 ——</div>
 
     <div class="spread">
         <div class="card-slot">
             <div class="slot-label">昨日 · 起源</div>
-            <div class="card" id="card-0">
-                <div class="card-face card-back"></div>
-                <div class="card-face card-front" id="front-0"></div>
-            </div>
+            <div class="card" id="card-0"><div class="card-face card-back"></div><div class="card-face card-front" id="front-0"></div></div>
         </div>
         <div class="card-slot">
             <div class="slot-label">今日 · 现状</div>
-            <div class="card" id="card-1">
-                <div class="card-face card-back"></div>
-                <div class="card-face card-front" id="front-1"></div>
-            </div>
+            <div class="card" id="card-1"><div class="card-face card-back"></div><div class="card-face card-front" id="front-1"></div></div>
         </div>
         <div class="card-slot">
             <div class="slot-label">明日 · 导向</div>
-            <div class="card" id="card-2">
-                <div class="card-face card-back"></div>
-                <div class="card-face card-front" id="front-2"></div>
-            </div>
+            <div class="card" id="card-2"><div class="card-face card-back"></div><div class="card-face card-front" id="front-2"></div></div>
         </div>
     </div>
 
-    <button onclick="drawFate()">开启命运阵列</button>
+    <button onclick="drawFate()">开启启示</button>
 
     <div class="reading-panel" id="readingPanel">
+        <h3 style="color:var(--gold); margin-top:0;">✨ 命运解读</h3>
         <div id="interpretationContent"></div>
     </div>
 
     <script>
-        // 塔罗牌数据库
         const tarotDeck = [
-            { name: "愚者", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg", up: "代表新的旅程、好奇心和纯真。建议勇敢迈出第一步，即使前路未知。", rev: "代表鲁莽和缺乏计划。警告你不要盲目跳入深渊，先看清脚下。" },
-            { name: "魔术师", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg", up: "你拥有达成目标所需的所有技能。现在是显化梦想、付诸行动的时刻。", rev: "可能存在沟通误导或能量浪费。提示你检查手中的资源是否被正确使用。" },
-            { name: "女祭司", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg", up: "直觉正处于敏锐期。静下心来，倾听内心深处的智慧和梦境的启示。", rev: "你可能忽略了直觉，或过于被外界噪音干扰。建议回归宁静寻找真相。" },
-            { name: "女皇", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_The_Empress.jpg", up: "丰硕、母性与自然的结合。这是一个充满创造力、生命力和感性的阶段。", rev: "可能出现了过度控制或创造力枯竭。需要重新与自然和自我感受建立联系。" },
-            { name: "皇帝", img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_The_Emperor.jpg", up: "权威、结构与保护。代表建立秩序的能力和稳固的基础。", rev: "可能意味着专制、僵化或缺乏纪律。提醒你灵活调整策略。" },
-            { name: "恋人", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/RWS_Tarot_06_Lovers.jpg", up: "代表和谐的关系、价值观的对齐。是一个关于内心真正渴望的重要抉择。", rev: "关系中出现失衡，或逃避做决定。需要重新审视自己的初心。" },
-            { name: "死神", img: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg", up: "旧阶段的终结，必然的转变。迎接新生前必须学会优雅地放手。", rev: "停滞不前，抗拒改变。虽然痛苦，但只有斩断腐朽才能迎来春季。" },
-            { name: "太阳", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_The_Sun.jpg", up: "成功、喜悦与光明。一切都在向好的方向发展，充满了正能量。", rev: "暂时的乌云遮日，或者过于乐观。需要保持务实的态度。" }
+            { name: "愚者", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-fool.jpg", up: "新的起点。建议勇敢迈出第一步。", rev: "鲁莽。警告先看清脚下再跳。" },
+            { name: "魔术师", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-magician.jpg", up: "创造力。你已具备所有资源。", rev: "沟通不畅。审视动机是否纯粹。" },
+            { name: "女祭司", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-high-priestess.jpg", up: "直觉。静下心听听内心的声音。", rev: "忽略直觉。不要逃避真相。" },
+            { name: "女皇", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-empress.jpg", up: "丰饶。关注自然与创造力的结合。", rev: "瓶颈。给自己一点喘息空间。" },
+            { name: "皇帝", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-emperor.jpg", up: "秩序。用理性和纪律达成目标。", rev: "僵化。权力也需要配合仁慈。" },
+            { name: "教皇", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-hierophant.jpg", up: "传统。寻求导师或规则的建议。", rev: "反叛。审视传统是否真的适合你。" },
+            { name: "恋人", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-lovers.jpg", up: "和谐。做出符合真心的选择。", rev: "失衡。不要因为压力而违心。" },
+            { name: "战车", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-chariot.jpg", up: "胜利。保持专注，掌控情绪前行。", rev: "失控。欲速则不达，先理清冲突。" },
+            { name: "力量", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/strength.jpg", up: "勇气。用耐心化解冲突而非蛮力。", rev: "怀疑。不要被本能的恐惧击败。" },
+            { name: "隐士", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-hermit.jpg", up: "反省。暂时退出社交寻找真理。", rev: "孤立。独处是为了看清而非逃避。" },
+            { name: "命运之轮", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-wheel-of-fortune.jpg", up: "转机。顺应时势，把握突发机会。", rev: "阻碍。接受起伏，不要死磕。" },
+            { name: "正义", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/justice.jpg", up: "公平。客观评估现状，承担责任。", rev: "不公。审视偏见，因果终会显现。" },
+            { name: "倒吊人", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-hanged-man.jpg", up: "换位。换个角度看世界，等待时机。", rev: "徒劳。学会放下，不要为了坚持而坚持。" },
+            { name: "死神", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/death.jpg", up: "新生。告别过去，拥抱转变。", rev: "抗拒。留住腐朽只会带来痛苦。" },
+            { name: "节制", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/temperance.jpg", up: "平衡。调和不同力量，寻找中道。", rev: "失衡。欲望失控，需找回平衡。" },
+            { name: "恶魔", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-devil.jpg", up: "束缚。觉察上瘾的事，你有权离开。", rev: "解脱。打破枷锁，重获自由。" },
+            { name: "高塔", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-tower.jpg", up: "剧变。接受崩塌，清理出好地基。", rev: "迟缓。崩塌不可避，越抗拒越难受。" },
+            { name: "星星", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-star.jpg", up: "希望。保持乐观，愿望正被祝福。", rev: "失望。不要让黑暗遮住星光。" },
+            { name: "月亮", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-moon.jpg", up: "不安。警惕幻象，现在不宜大动作。", rev: "消除。迷雾散去，真相显现。" },
+            { name: "太阳", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-sun.jpg", up: "成功。尽情展现光芒，正能量充沛。", rev: "遮蔽。保持谦虚，务实前行。" },
+            { name: "审判", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/judgement.jpg", up: "觉醒。总结过去，听从内心感召。", rev: "怀疑。不要怕改变，旧债需清偿。" },
+            { name: "世界", img: "https://cdn.statically.io/gh/rwsos/tarot-images/main/cards/the-world.jpg", up: "圆满。庆祝胜利，循环已完成。", rev: "延迟。最后一步最关键，别半途而废。" }
         ];
 
         function drawFate() {
@@ -287,53 +180,44 @@
             panel.style.display = 'none';
             content.innerHTML = "";
 
-            // 洗牌逻辑
             let shuffled = [...tarotDeck].sort(() => Math.random() - 0.5);
-            let slots = ["昨日起源", "今日现状", "明日导向"];
-            let analysisHTML = `<h3 style="color:var(--gold); margin-top:0;">✨ 命运解读</h3>`;
+            let posLabels = ["昨日·起源", "今日·现状", "明日·导向"];
+            let htmlBuffer = "";
 
             for (let i = 0; i < 3; i++) {
                 const card = shuffled[i];
-                const isReversed = Math.random() > 0.5;
+                const isRev = Math.random() > 0.5;
                 const cardUI = document.getElementById(`card-${i}`);
                 const frontUI = document.getElementById(`front-${i}`);
 
-                // 立即重置
                 cardUI.classList.remove('is-flipped');
                 
-                // 延迟展示动画
                 setTimeout(() => {
-                    const meaning = isReversed ? card.rev : card.up;
-                    
-                    // 渲染牌面
                     frontUI.innerHTML = `
-                        <div class="card-inner-border">
-                            <div class="card-header"></div>
-                            <div class="card-img-box">
-                                <img src="${card.img}" class="${isReversed ? 'img-reversed' : ''}">
+                        <div class="inner-border">
+                            <div class="img-box">
+                                <img src="${card.img}" class="${isRev ? 'img-reversed' : ''}" onerror="this.src='https://dummyimage.com/170x290/1e293b/d4af37&text=Loading...'">
                                 <div class="shine"></div>
                             </div>
                             <div class="card-info">
-                                <p class="card-title">${card.name}</p>
-                                ${isReversed ? '<span class="card-status">【逆位】</span>' : '<span class="card-status" style="color:#2ecc71">【正位】</span>'}
+                                <p class="card-name">${card.name}</p>
+                                <span class="card-status" style="color:${isRev?'#cc4444':'#2ecc71'}">${isRev?'【逆位】':'【正位】'}</span>
                             </div>
                         </div>
                     `;
-                    
                     cardUI.classList.add('is-flipped');
 
-                    // 填充解读
-                    analysisHTML += `
+                    htmlBuffer += `
                         <div class="reading-item">
-                            <span class="reading-pos">【${slots[i]}】</span>
-                            <strong>${card.name}${isReversed?'（逆位）':''}</strong>：
-                            <span style="color:#cbd5e1">${meaning}</span>
+                            <span class="pos-tag">【${posLabels[i]}】</span>
+                            <strong>${card.name}${isRev?'（逆位）':''}</strong>：
+                            <span style="color:#cbd5e1">${isRev ? card.rev : card.up}</span>
                         </div>
                     `;
 
-                    if (i === 2) {
+                    if(i === 2) {
                         setTimeout(() => {
-                            content.innerHTML = analysisHTML;
+                            content.innerHTML = htmlBuffer;
                             panel.style.display = 'block';
                         }, 800);
                     }
